@@ -1,10 +1,10 @@
 # HexPawb
 
-HexPawb is a from-scratch implementation of onion routing, using the concepts of [walking onions](https://www.usenix.org/system/files/sec20-komlo.pdf) to significantly decrease network bandwidth requirements.
+HexPawb is a from-scratch implementation of onion routing, using modern technology to .
 It natively supports:
 
 - Anonymously connecting to normal servers over the network
-- Hosting anonymous services
+- Hosting anonymous services with end-to-end encrypted connections
 - Running as a SOCKS proxy *or* VPN
 - Disabling internet access when not connected
 - Automatic relay management
@@ -29,3 +29,8 @@ It has bindings in several languages.
 
 HexPawb is sort of a knockoff of Tor -- at least in the sense that it serves a similar purpose, but pragmatically it also borrows several features from Tor[.](https://e926.net/posts?tags=paws "I'm a furry, you can guess the real reason.")
 So if Tor is Mage Hand, allowing someone to interact at a distance without the affiliation being obvious, then this is Hex Pawb.
+
+## How's it work?
+
+An explanation of everything from high-level overviews to bit-by-bit dissections of network formats is available in [the wiki](https://github.com/nic-hartley/hexpawb/wiki).
+If you know a bit about Tor, it'll look very familiar.
