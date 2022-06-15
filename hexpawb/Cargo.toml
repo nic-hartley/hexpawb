@@ -1,6 +1,6 @@
 [package]
 name = "hexpawb"
-version = "0.0.1"
+version = "0.1.1"
 edition = "2021"
 description = "A library to easily connect to the HexPawb network"
 repository = "https://github.com/nic-hartley/hexpawb"
