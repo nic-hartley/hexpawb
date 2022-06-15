@@ -11,5 +11,9 @@ name = "hexpawb"
 version = "0.1.0"
 
 [[package]]
+name = "hexpawb-raw"
+version = "0.1.0"
+
+[[package]]
 name = "pawb"
 version = "0.1.0"

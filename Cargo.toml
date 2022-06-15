@@ -1,2 +1,2 @@
 [workspace]
-members = ["hexpawb", "pawb", "furtive"]
+members = ["hexpawb", "hexpawb-raw", "pawb", "furtive"]
