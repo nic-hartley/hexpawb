@@ -1,0 +1,11 @@
+[package]
+name = "hexpawb"
+version = "0.1.0"
+edition = "2021"
+description = "A library implementing the core functionality of the HexPawb spec"
+repository = "https://github.com/nic-hartley/hexpawb"
+license = "BSD-3-Clause"
+keywords = [ "tor", "anonymization", "onion-routing", "privacy" ]
+categories = [ "cryptography", "network-programming" ]
+
+[dependencies]
