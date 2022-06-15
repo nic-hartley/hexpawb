@@ -4,16 +4,16 @@ version = 3
 
 [[package]]
 name = "furtive"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "hexpawb"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "hexpawb-raw"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "pawb"
-version = "0.1.0"
+version = "0.0.1"
