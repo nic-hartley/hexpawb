@@ -15,5 +15,9 @@ name = "hexpawb-raw"
 version = "0.1.1"
 
 [[package]]
+name = "hexpawb-relay"
+version = "0.1.1"
+
+[[package]]
 name = "pawb"
 version = "0.1.1"

@@ -1,0 +1,11 @@
+[package]
+name = "hexpawb-relay"
+version = "0.1.1"
+edition = "2021"
+description = "A command-line tool for running HexPawb relays"
+repository = "https://github.com/nic-hartley/hexpawb"
+license = "BSD-3-Clause"
+keywords = [ "tor", "anonymization", "onion-routing", "privacy", "hexpawb" ]
+categories = [ "cryptography", "network-programming" ]
+
+[dependencies]
