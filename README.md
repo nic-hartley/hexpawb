@@ -1,6 +1,6 @@
 # HexPawb
 
-HexPawb is a from-scratch implementation of onion routing, using modern technology to .
+HexPawb is a from-scratch implementation of onion routing, using modern technology to decentralize network loads without compromising anonymity.
 It natively supports:
 
 - Anonymously connecting to normal servers over the network
