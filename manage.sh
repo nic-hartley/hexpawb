@@ -45,11 +45,14 @@ bump_version() {
         patch=$(($patch+1))
         ;;
     *)
-        echo "Unknown command $1"
+        echo "Unknown/missing version part $1"
+        exit 1
         ;;
     esac
     version="$major.$minor.$patch"
 }
+
+set -e
 
 case "$1" in
 ver)
@@ -60,13 +63,12 @@ ver)
     get_version
     bump_version "$2"
     for proj in $(projects); do
-        sed -iE '
+        sed -i -E '
             s/^version.*$/version = "'"$version"'"/
             s/^hexpawb\s*=\s*".*$/hexpawb = "'"$version"'"/
             s/^(hexpawb\s*=\s*\{.*version\s*=\s*)"[^"]+"/\1"'"$version"'"/
         ' "$proj"/Cargo.toml
     done
-    git commit -am "bumped versions automatically"
     echo "Bumped version to $version"
     ;;
 check)
@@ -80,6 +82,6 @@ publish)
     wait
     ;;
 *)
-    echo "Unknown command $cmd"
+    echo "Unknown/missing command $cmd"
     ;;
 esac
