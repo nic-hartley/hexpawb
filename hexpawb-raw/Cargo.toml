@@ -1,8 +1,8 @@
 [package]
 name = "hexpawb-raw"
-version = "0.1.1"
+version = "99.99.99"
 edition = "2021"
-description = "A low-level library implementing the core functionality of the HexPawb spec"
+description = "Yanked crate, do not use!"
 repository = "https://github.com/nic-hartley/hexpawb"
 license = "BSD-3-Clause"
 keywords = [ "tor", "anonymization", "onion-routing", "privacy", "hexpawb" ]
