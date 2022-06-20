@@ -1,6 +1,6 @@
 [package]
 name = "furtive"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "A command-line tool for furtive services on HexPawb"
 repository = "https://github.com/nic-hartley/hexpawb"

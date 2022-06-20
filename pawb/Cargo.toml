@@ -1,6 +1,6 @@
 [package]
 name = "pawb"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "A command-line tool for clients making it easy to connect over HexPawb"
 repository = "https://github.com/nic-hartley/hexpawb"
@@ -10,5 +10,5 @@ categories = [ "cryptography", "network-programming" ]
 
 [dependencies]
 futures = "0.3.21"
-hexpawb = { version = "0.1.1", path = "../hexpawb" }
+hexpawb = { version = "0.1.2", path = "../hexpawb" }
 tokio = { version = "1.19.2", features = ["full", "io-std"] }
