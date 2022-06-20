@@ -8,4 +8,8 @@ license = "BSD-3-Clause"
 keywords = [ "tor", "anonymization", "onion-routing", "privacy", "hexpawb" ]
 categories = [ "cryptography", "network-programming" ]
 
+[features]
+dangerous-low-level-bits = []
+
 [dependencies]
+futures = "0.3.21"

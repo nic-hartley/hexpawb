@@ -9,3 +9,6 @@ keywords = [ "tor", "anonymization", "onion-routing", "privacy", "hexpawb" ]
 categories = [ "cryptography", "network-programming" ]
 
 [dependencies]
+futures = "0.3.21"
+hexpawb = { version = "0.1.1", path = "../hexpawb" }
+tokio = { version = "1.19.2", features = ["full", "io-std"] }
