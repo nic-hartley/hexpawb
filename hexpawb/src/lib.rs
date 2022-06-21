@@ -49,15 +49,19 @@ std::io::copy(circuit, std::io::stdout().lock()).await
 ```
  */
 
-use core::task;
-use std::{io, net::{SocketAddr, IpAddr}, pin::Pin};
-
-use futures::{AsyncRead, AsyncWrite};
+use std::net::{IpAddr, SocketAddr};
 
 #[derive(Debug)]
 pub enum PawbError {}
 
 pub type PawbResult<T> = Result<T, PawbError>;
+
+/*
+#[cfg(feature = "rt-sync")]
+pub fn
+#[cfg(not(feature = "rt-sync"))]
+pub async fn
+*/
 
 /**
 Represents the current known state of the HexPawb network. Allows you to
@@ -75,6 +79,12 @@ impl Network {
     Connect into the HexPawb network. This will download the necessary
     connection information and a starter set of relays to connect into.
     */
+    #[cfg(feature = "rt-sync")]
+    pub fn connect() -> PawbResult<Network> {
+        NetworkBuilder::standard().connect()
+    }
+
+    #[cfg(not(feature = "rt-sync"))]
     pub async fn connect() -> PawbResult<Network> {
         NetworkBuilder::standard().connect().await
     }
@@ -103,6 +113,11 @@ impl Network {
     lone circuit is almost never enough, but one per connection is usually far
     too many. See the [`Circuit`] documentation for more details.
     */
+    #[cfg(feature = "rt-sync")]
+    pub fn circuit(&self) -> PawbResult<Circuit> {
+        todo!()
+    }
+    #[cfg(not(feature = "rt-sync"))]
     pub async fn circuit(&self) -> PawbResult<Circuit> {
         todo!()
     }
@@ -128,6 +143,11 @@ impl NetworkBuilder {
     /**
     Actually reach out and start connecting to this network.
     */
+    #[cfg(feature = "rt-sync")]
+    pub fn connect(self) -> PawbResult<Network> {
+        todo!()
+    }
+    #[cfg(not(feature = "rt-sync"))]
     pub async fn connect(self) -> PawbResult<Network> {
         todo!()
     }
@@ -183,39 +203,153 @@ two hunting all this information down.
 */
 pub struct Circuit {}
 impl Circuit {
+    #[cfg(feature = "rt-sync")]
+    pub fn dns(&mut self, _name: &str) -> PawbResult<Vec<IpAddr>> {
+        todo!()
+    }
+    #[cfg(not(feature = "rt-sync"))]
     pub async fn dns(&mut self, _name: &str) -> PawbResult<Vec<IpAddr>> {
         todo!()
     }
 
+    #[cfg(feature = "rt-sync")]
+    pub fn tcp(&mut self, _dest: SocketAddr) -> PawbResult<PawbTcpStream> {
+        todo!()
+    }
+    #[cfg(not(feature = "rt-sync"))]
     pub async fn tcp(&mut self, _dest: SocketAddr) -> PawbResult<PawbTcpStream> {
         todo!()
     }
 }
 
-pub struct PawbTcpStream {}
-impl AsyncRead for PawbTcpStream {
-    fn poll_read(
-        self: Pin<&mut Self>,
-        _cx: &mut task::Context<'_>,
-        _buf: &mut [u8],
-    ) -> task::Poll<io::Result<usize>> {
-        todo!()
+#[cfg(feature = "rt-tokio")]
+mod tcpstream {
+    use tokio::{
+        io::{AsyncRead, AsyncWrite},
+        net::UdpSocket,
+    };
+
+    pub struct Stream {
+        socket: UdpSocket,
+    }
+    impl AsyncRead for Stream {
+        fn poll_read(
+            self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
+            buf: &mut tokio::io::ReadBuf<'_>,
+        ) -> std::task::Poll<std::io::Result<()>> {
+            todo!()
+        }
+    }
+    impl AsyncWrite for Stream {
+        fn poll_write(
+            self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
+            buf: &[u8],
+        ) -> std::task::Poll<Result<usize, std::io::Error>> {
+            todo!()
+        }
+        fn poll_flush(
+            self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
+        ) -> std::task::Poll<Result<(), std::io::Error>> {
+            todo!()
+        }
+        fn poll_shutdown(
+            self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
+        ) -> std::task::Poll<Result<(), std::io::Error>> {
+            todo!()
+        }
     }
 }
-impl AsyncWrite for PawbTcpStream {
-    fn poll_write(
-        self: Pin<&mut Self>,
-        _cx: &mut task::Context<'_>,
-        _buf: &[u8],
-    ) -> task::Poll<io::Result<usize>> {
-        todo!()
-    }
+#[cfg(feature = "rt-async-std")]
+mod tcpstream {
+    use tokio::{
+        io::{AsyncRead, AsyncWrite},
+        net::UdpSocket,
+    };
 
-    fn poll_flush(self: Pin<&mut Self>, _cx: &mut task::Context<'_>) -> task::Poll<io::Result<()>> {
-        todo!()
+    pub struct Stream {
+        socket: UdpSocket,
     }
-
-    fn poll_close(self: Pin<&mut Self>, _cx: &mut task::Context<'_>) -> task::Poll<io::Result<()>> {
-        todo!()
+    impl AsyncRead for Stream {
+        fn poll_read(
+            self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
+            buf: &mut tokio::io::ReadBuf<'_>,
+        ) -> std::task::Poll<std::io::Result<()>> {
+            todo!()
+        }
+    }
+    impl AsyncWrite for Stream {
+        fn poll_write(
+            self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
+            buf: &[u8],
+        ) -> std::task::Poll<Result<usize, std::io::Error>> {
+            todo!()
+        }
+        fn poll_flush(
+            self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
+        ) -> std::task::Poll<Result<(), std::io::Error>> {
+            todo!()
+        }
+        fn poll_shutdown(
+            self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
+        ) -> std::task::Poll<Result<(), std::io::Error>> {
+            todo!()
+        }
     }
 }
+
+// if they dont' enable an async runtime, default to sync
+#[cfg(feature = "rt-sync")]
+mod tcpstream {
+    use std::{
+        io::{self, Read, Write},
+        net::UdpSocket,
+    };
+
+    pub struct Stream {
+        #[allow(unused)]
+        socket: UdpSocket,
+    }
+    impl Stream {
+        pub fn nonblocking(&self) -> bool {
+            todo!()
+        }
+        pub fn set_nonblocking(&mut self, _val: bool) {
+            todo!()
+        }
+    }
+    impl Read for Stream {
+        fn read(&mut self, _buf: &mut [u8]) -> io::Result<usize> {
+            todo!()
+        }
+    }
+    impl Write for Stream {
+        fn write(&mut self, _buf: &[u8]) -> io::Result<usize> {
+            todo!()
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            todo!()
+        }
+    }
+}
+
+/**
+A TCP stream that's going over HexPawb.
+
+This is meant to be *mostly* source-compatible with `tokio::net::TcpStream` or
+`async_std::net::TcpStream`, though some options (notably, `TCP_NODELAY`) are
+unavailable for technical reasons.
+
+Depending on your features this implements different traits:
+- `futures`: `futures::io::AsyncRead`
+- `async-std`: `async_std::io::Read`
+- `tokio`: `tokio::io::AsyncRead`
+*/
+pub use tcpstream::Stream as PawbTcpStream;
