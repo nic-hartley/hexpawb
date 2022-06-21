@@ -1,45 +1,71 @@
-use std::{env, net::SocketAddr};
+use std::{
+    env,
+    io::{self, Read, Write},
+    net::SocketAddr,
+    sync::mpsc::{sync_channel, TryRecvError},
+    thread,
+    time::Duration,
+};
 
-use futures::{AsyncReadExt as _, AsyncWriteExt as _};
 use hexpawb::Network;
-use tokio::io::{self, AsyncWriteExt as _, AsyncReadExt as _};
 
-#[tokio::main]
-async fn main() {
+fn main() {
     // For now, basically netcat but through pawb
     let mut args = env::args().skip(1);
     let dest_name = args.next().expect("provide a destination");
-    let dest_port = args.next().map(|s| s.parse::<u16>().ok()).flatten().unwrap_or(80);
-    let network = Network::connect()
-        .await
-        .expect("Failed to connect to HexPawb");
-    let mut circuit = network.circuit().await.expect("Failed to create circuit");
-    let dest_addr = circuit.dns(&dest_name).await
+    let dest_port = args
+        .next()
+        .map(|s| s.parse::<u16>().ok())
+        .flatten()
+        .unwrap_or(80);
+    let network = Network::connect().expect("Failed to connect to HexPawb");
+    let mut circuit = network.circuit().expect("Failed to create circuit");
+    let dest_addr = circuit
+        .dns(&dest_name)
         .expect("Failed to DNS destination")
-        .into_iter().next()
+        .into_iter()
+        .next()
         .expect("Did not get any IP addresses");
-    let mut cxn = circuit.tcp(SocketAddr::new(dest_addr, dest_port)).await
+
+    let (stdin_s, stdin_r) = sync_channel(8);
+    let inp_thread = std::thread::spawn(move || {
+        let mut stdin = io::stdin().lock();
+        let mut buf = vec![0; 16384];
+        loop {
+            let amt = stdin.read(&mut buf).expect("Failed to read input data");
+            stdin_s
+                .send(buf[..amt].to_vec())
+                .expect("Failed to handle input data");
+        }
+    });
+
+    let mut cxn = circuit
+        .tcp(SocketAddr::new(dest_addr, dest_port))
         .expect("Failed to connect over circuit");
+    cxn.set_nonblocking(true);
     let mut cxn_buf = vec![0; 16384];
+    let mut stdout = io::stdout().lock();
 
-    let mut stdin = io::stdin();
-    let mut stdin_buf = vec![0; 16384];
-
-    let mut stdout = io::stdout();
     loop {
-        tokio::select! {
-            amount = cxn.read(&mut cxn_buf) => {
-                let amount = amount
-                    .expect("Failed to download data");
-                stdout.write_all(&cxn_buf[..amount]).await
+        match cxn.read(&mut cxn_buf) {
+            Ok(amt) => {
+                stdout
+                    .write_all(&cxn_buf[..amt])
                     .expect("Failed to write downloaded data");
             }
-            amount = stdin.read(&mut stdin_buf) => {
-                let amount = amount
-                    .expect("Failed to read uploadable data");
-                cxn.write_all(&stdin_buf[..amount]).await
-                    .expect("Failed to upload data");
+            Err(e) if e.kind() == io::ErrorKind::WouldBlock => match stdin_r.try_recv() {
+                Ok(data) => {
+                    cxn.write_all(&data).expect("Failed to upload input data");
+                }
+                Err(TryRecvError::Empty) => (),
+                Err(TryRecvError::Disconnected) => break,
+            },
+            other => {
+                other.expect("Failed to read downloaded data");
             }
         }
+        thread::sleep(Duration::from_millis(50));
     }
+
+    inp_thread.join().expect("Failed to join thread");
 }
